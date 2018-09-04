@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>http-server-nodejs</title>
+</head>
+<body>
+    <h1>http-server-nodejs</h1>
+    <button id="btn">
+        Load from ajax
+    </button>
+    <div>
+        <strong>RES:</strong>
+        <pre id="response"></pre>
+    </div>
+    <script src="/static/js.js"></script>
+    <script>
+
+        const $el = {
+            btn: document.querySelector('#btn'),
+            res: document.querySelector('#response'),
+        }
+
+        const api = ((cnf={}, method='POST') => {
+            const api = {},
+                defErrMess = 'Response don\'t have `success` = "true"',
+                url = (url, data={}) => fetch(url, {
+                    method,
+                    // credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'x-requested-with': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then(r => r.json())
+                    .then(r => {
+                        if (!r.success) {
+                            // r.message = 'Min len 10'
+                            console.error('throw Error!', r);
+                            return Promise.reject((r && r.message) || defErrMess);
+                        }
+                        return r.data;
+                    })
+                    .catch(err => {
+                        // noti
+                        // console.error('==>', err);
+                        // (app.noti || console.error)(err && err.toString && err.toString());
+                        throw new Error(`API: ${err}`)
+                    }),
+                gen = cnf => {
+
+                    // const cnfType = Array.isArray(cnf)? 'array': typeof(cnf)
+
+                    // return genFrom[cnfType](cnf)
+
+                    for (let i in cnf) {
+                        // NOTE: Need for testing
+                        // console.log(' -> i:', i);
+                        api[i] = {}
+                        for (let j of cnf[i]) {
+                            // console.log(' -> j:', j);
+                            api[i][j.name] = (data) => url(j.url, data)
+                        }
+                    }
+                    // NOTE: Need for testing
+                    // console.log(' -> api:', api);
+                    // console.log(' -> gen:', typeof gen);
+                    return api;
+                }//,
+                // genFrom = {
+                //     api: (_cnf) => {
+
+                //     },
+                //     'object': (cnf/*, name*/) => {
+                //         let res = {},
+                //             names = Object.keys(cnf),
+                //             isGenCnf = 'name' in cnf && ('fn' in cnf || 'url' in cnf);
+                //         if (isGenCnf) {
+                //             res = fn.getApi(cnf);
+                //         } else {
+                //             for (var i = names.length - 1; i >= 0; i--) {
+                //                 let name = names[i],
+                //                     conf = cnf[name],
+                //                     type = fn.typeof(conf);
+                //                 res[name] = fn.from[type](conf, name);
+                //             }
+                //         }
+                //         return res;
+                //     },
+                //     'array': cnf => {
+                //         let res = {};
+
+                //         for (var j in cnf) {
+                //             let config = cnf[j];
+                //             if (config.name && (config.url || config.fn)) {
+                //                 res[config.name] = fn.getApi(config);
+                //             } else {
+                //                 res = fn.from[fn.typeof(config)](config);
+                //             }
+                //         }
+
+                //         return res;
+                //     },
+                //     'function': (cnf, name) => {
+                //         let config = cnf();
+                //         config.name = name;
+                //         return fn.getApi(config);
+                //     },
+                //     'string': (cnf, name) => {
+                //         return genFrom.api({
+                //             url: cnf,
+                //             name,
+                //         });
+                //     },
+                // }
+
+            return gen(cnf)
+        })({
+            user: [{
+                name: 'test',
+                url: '/api/test',
+            }, {
+                name: 'demo',
+                url: '/api/demo',
+            }, {
+                name: 'init',
+                url: '/api/init',
+            }],
+            test: [{
+                name: 'email',
+                url: '/api/email',
+            }, {
+                name: 'email1',
+                url: '/api/email1',
+            }]
+        }/*, 'GET' // in dev mode for dev-server */);
+
+        $el.btn.addEventListener('click', () => {
+            api.user.test().then(res => {
+                console.info(' =>', res)
+                $el.res.innerHTML = JSON.stringify(res)
+            });
+        })
+    </script>
+</body>
+</html>

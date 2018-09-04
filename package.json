@@ -1,0 +1,45 @@
+{
+  "name": "http-server-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server0": "http-server",
+    "server": "babel-node backend/app",
+    "backend:server": "babel-node backend/app",
+    "backend:dev": "nodemon -w backend --exec npm run backend:server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/node": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "glob": "^7.1.3",
+    "http-server": "^0.11.1",
+    "module-alias": "^2.1.0",
+    "nodemon": "^1.18.4",
+    "prettier": "^1.14.2"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@app": "backend/app",
+    "@back": "backend",
+    "@front": "frontend",
+    "@dist": "frontend/dist",
+    "@cnf": "_config"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ],
+    "plugins": []
+  }
+}
